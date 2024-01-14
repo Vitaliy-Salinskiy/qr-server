@@ -13,7 +13,13 @@ export class UserService {
 
 	async createUser(user) {
 		try {
+			const existingUser = await User.findOne({ id: user.id });
+
+			if (existingUser) {
+				return { message: 'You Back!!!' }
+			}
 			const createdUser = new User(user).save();
+
 			return createdUser;
 		} catch (error) {
 			throw error;
