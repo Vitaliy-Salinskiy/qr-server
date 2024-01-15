@@ -15,6 +15,12 @@ const UserSchema = new Schema({
 		type: Number,
 		default: 0,
 	},
+	name: {
+		type: String,
+	},
+	surname: {
+		type: String
+	},
 });
 
 const User = model('User', UserSchema);

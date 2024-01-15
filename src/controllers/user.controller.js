@@ -14,6 +14,15 @@ export class UserController {
 		}
 	};
 
+	getUser = async (req, res) => {
+		try {
+			const user = await this.userService.getUser(req.params.id);
+			res.json(user);
+		} catch (error) {
+			res.status(500).json({ message: error.message });
+		}
+	}
+
 	createUser = async (req, res) => {
 		try {
 			const user = await this.userService.createUser(req.body);
@@ -26,6 +35,15 @@ export class UserController {
 	updateUser = async (req, res) => {
 		try {
 			const user = await this.userService.updateUser(req.body.date, req.params.id);
+			res.json(user);
+		} catch (error) {
+			res.status(500).json({ message: error.message });
+		}
+	};
+
+	addCredentials = async (req, res) => {
+		try {
+			const user = await this.userService.addCredentials(req.body.data, req.params.id);
 			res.json(user);
 		} catch (error) {
 			res.status(500).json({ message: error.message });

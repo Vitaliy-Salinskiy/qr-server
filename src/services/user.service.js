@@ -11,6 +11,20 @@ export class UserService {
 		}
 	}
 
+	async getUser(id) {
+		try {
+			const user = await User.findOne({ id: id }).exec();
+
+			if (!user) {
+				throw new Error('User not found');
+			}
+
+			return user;
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	async createUser(user) {
 		try {
 			const existingUser = await User.findOne({ id: user.id });
@@ -54,6 +68,20 @@ export class UserService {
 			updatedUser.save();
 
 			return updatedUser;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async addCredentials(data, id) {
+		try {
+			const user = await User.findOneAndUpdate({ id: id }, data, { new: true });
+
+			if (!user) {
+				throw new Error('No users found');
+			}
+
+			return user;
 		} catch (error) {
 			throw error;
 		}
