@@ -34,7 +34,7 @@ export class UserController {
 
 	updateUser = async (req, res) => {
 		try {
-			const user = await this.userService.updateUser(req.body.date, req.params.id);
+			const user = await this.userService.updateUser(req.params.id);
 			res.json(user);
 		} catch (error) {
 			res.status(500).json({ message: error.message });

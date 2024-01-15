@@ -40,7 +40,7 @@ export class UserService {
 		}
 	}
 
-	async updateUser(date, userId) {
+	async updateUser(userId) {
 		try {
 			const updatedUser = await User.findOne({ id: userId });
 
@@ -48,12 +48,8 @@ export class UserService {
 				throw new Error('User not found');
 			}
 
-			if (!date) {
-				throw new Error('Date not provided');
-			}
-
 			const lastScannedDate = updatedUser.lastScanned ? updatedUser.lastScanned.toISOString().split('T')[0] : null;
-			const currentDate = new Date(date).toISOString().split('T')[0];
+			const currentDate = new Date().toISOString().split('T')[0];
 
 			if (lastScannedDate === currentDate) {
 				return { res: 'You have already scanned today' };
@@ -63,7 +59,7 @@ export class UserService {
 				throw new Error('The new date must be later than the last scanned date');
 			}
 
-			updatedUser.lastScanned = date;
+			updatedUser.lastScanned = new Date();
 			updatedUser.timesScanned++;
 			updatedUser.save();
 
