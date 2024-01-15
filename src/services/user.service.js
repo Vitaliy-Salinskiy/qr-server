@@ -90,6 +90,9 @@ export class UserService {
 	async getAllScans() {
 		try {
 			const users = await User.find({ lastScanned: { $ne: null } });
+			if (!users) {
+				return 0;
+			}
 			const scans = users.reduce((acc, user) => acc + user.timesScanned, 0);
 			return scans;
 		} catch (error) {
