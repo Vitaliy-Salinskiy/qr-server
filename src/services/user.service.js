@@ -42,7 +42,7 @@ export class UserService {
 			const currentDate = new Date(date).toISOString().split('T')[0];
 
 			if (lastScannedDate === currentDate) {
-				throw new Error('You have already scanned today');
+				return { res: 'You have already scanned today' };
 			}
 
 			if (lastScannedDate && currentDate <= lastScannedDate) {
