@@ -3,7 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 
-import userRoutes from './routes/user.route.js';
+import userRoutes from './routes/user.routes.js';
+import productRoutes from './routes/product.routes.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use('/users', userRoutes);
+app.use('/products', productRoutes);
 
 const bootstrap = () => {
 	try {
