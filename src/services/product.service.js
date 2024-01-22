@@ -13,6 +13,18 @@ export class ProductService {
 		}
 	}
 
+	async getProduct(id) {
+		try {
+			const product = await Product.findById(id);
+			if (!product) {
+				throw new Error('Product not found');
+			}
+			return product;
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	async createProduct(product, image) {
 		try {
 			if (!image || !product) {

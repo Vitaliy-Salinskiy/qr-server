@@ -9,9 +9,9 @@ import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import requestRoutes from './routes/request.routes.js';
 
 import './strategies/local.strategy.js';
-import Admin from './schemas/admin.schema.js';
 
 dotenv.config();
 
@@ -22,31 +22,18 @@ app.use(cors());
 app.use(express.json());
 
 app.use(session({
-	secret: 'adapter',
+	secret: process.env.SESSION_SECRET,
 	resave: false,
 	saveUninitialized: false
 }));
-
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser(function (admin, done) {
-	done(null, admin._id);
-});
-
-passport.deserializeUser(async function (id, done) {
-	try {
-		const user = await Admin.findById(id);
-		done(null, user);
-	} catch (err) {
-		done(err);
-	}
-});
-
 app.use('/users', userRoutes);
 app.use('/products', productRoutes);
-app.use('/admin', adminRoutes);
+app.use('/admins', adminRoutes);
 app.use('/auth', authRoutes);
+app.use('/requests', requestRoutes);
 
 const bootstrap = () => {
 	try {
