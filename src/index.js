@@ -4,6 +4,7 @@ import cors from 'cors';
 import passport from 'passport';
 import mongoose from 'mongoose';
 import session from 'express-session';
+import { join, dirname } from 'path';
 
 import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
@@ -34,6 +35,10 @@ app.use('/products', productRoutes);
 app.use('/admins', adminRoutes);
 app.use('/auth', authRoutes);
 app.use('/requests', requestRoutes);
+
+app.use('/uploads', express.static('uploads', {
+	maxAge: '1d'
+}));
 
 const bootstrap = () => {
 	try {

@@ -52,16 +52,23 @@ export class UserService {
 			const currentDate = new Date().toISOString().split('T')[0];
 
 			if (lastScannedDate === currentDate) {
-				return { res: 'You have already scanned today' };
+				return { message: 'You have already scanned today' };
 			}
 
 			if (lastScannedDate && currentDate <= lastScannedDate) {
 				throw new Error('The new date must be later than the last scanned date');
 			}
 
+			const newScan = {
+				date: new Date(),
+				totalScans: updatedUser.timesScanned + 1
+			}
+
+			updatedUser.scanHistory.push(newScan);
+
 			updatedUser.lastScanned = new Date();
 			updatedUser.timesScanned++;
-			updatedUser.save();
+			await updatedUser.save();
 
 			return updatedUser;
 		} catch (error) {
