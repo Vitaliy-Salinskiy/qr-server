@@ -8,22 +8,15 @@ export class RequestController {
 
 	addRequest = async (req, res) => {
 		try {
-			const user = await User.findById(req.params.userId).populate("requests").exec();
+			const user = await User.findOne({ id: req.params.userId }).populate("requests").exec();
 			const product = await productService.getProduct(req.params.productId);
 
 			if (!user || !product) {
 				return res.status(404).json({ message: "User or product not found" });
 			}
 
-
 			if (user.timesScanned < product.price) {
 				return res.status(400).json({ message: "User doesn't have enough points" });
-			}
-
-			const isUnique = user.requests.some(request => request.productId.toString() === product._id.toString());
-
-			if (isUnique) {
-				return res.status(400).json({ message: "User already requested this product" });
 			}
 
 			const request = await new Request({ userId: user._id, productId: product._id }).save();
@@ -70,7 +63,9 @@ export class RequestController {
 			user.requests = user.requests.filter(requestId => requestId.toString() !== request.id.toString());
 			await user.save();
 
-			await Request.findByIdAndDelete(req.params.id);
+			request.status = "allowed";
+
+			await request.save();
 
 			res.status(200).json({ message: "Request allowed" });
 		} catch (error) {
@@ -98,7 +93,9 @@ export class RequestController {
 
 			await user.save();
 
-			await Request.findByIdAndDelete(req.params.id);
+			request.status = "denied";
+
+			await request.save();
 
 			res.status(200).json({ message: "Request denied" });
 		} catch (error) {
