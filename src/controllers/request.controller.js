@@ -11,13 +11,10 @@ export class RequestController {
 			const user = await User.findById(req.params.userId).populate("requests").exec();
 			const product = await productService.getProduct(req.params.productId);
 
-			console.log(user);
-
 			if (!user || !product) {
 				return res.status(404).json({ message: "User or product not found" });
 			}
 
-			const request = await new Request({ userId: user._id, productId: product._id }).save();
 
 			if (user.timesScanned < product.price) {
 				return res.status(400).json({ message: "User doesn't have enough points" });
@@ -27,6 +24,12 @@ export class RequestController {
 
 			if (isUnique) {
 				return res.status(400).json({ message: "User already requested this product" });
+			}
+
+			const request = await new Request({ userId: user._id, productId: product._id }).save();
+
+			if (!request) {
+				return res.status(500).json({ message: "Error creating request" });
 			}
 
 			user.requests.push(request._id);
@@ -42,7 +45,7 @@ export class RequestController {
 
 	getRequests = async (req, res) => {
 		try {
-			const requests = await Request.find();
+			const requests = await Request.find().populate("userId productId").exec();
 			res.status(200).json(requests);
 		} catch (error) {
 			res.status(500).json({ message: error.message });

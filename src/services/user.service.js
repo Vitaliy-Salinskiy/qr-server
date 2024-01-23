@@ -4,7 +4,7 @@ export class UserService {
 
 	async getUsers() {
 		try {
-			const users = await User.find();
+			const users = await User.find().populate('requests').exec();
 			return users;
 		} catch (error) {
 			throw error;
