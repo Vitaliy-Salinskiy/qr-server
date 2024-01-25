@@ -4,7 +4,8 @@ import cors from 'cors';
 import passport from 'passport';
 import mongoose from 'mongoose';
 import session from 'express-session';
-import { join, dirname } from 'path';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 
 import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
@@ -18,6 +19,22 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+const options = {
+	definition: {
+		openapi: '3.0.0',
+		info: {
+			title: 'QR Backend',
+			version: '1.0.0',
+			description: 'QR Backend API'
+		},
+	},
+	apis: ['./src/routes/*.js', './src/schemas/*.js'],
+}
+
+const specs = swaggerJsdoc(options);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use(cors());
 app.use(express.json());
