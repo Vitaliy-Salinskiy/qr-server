@@ -24,6 +24,30 @@ const authMiddleware = (req, res, next) => {
 }
 
 
+/**
+ * @swagger
+ *  /auth/login:
+ *   post:
+ *    tags: [Auth]
+ *    summary: Login
+ *    requestBody:
+ *     required: true
+ *     content: 
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/Admin'
+ *       example:
+ *        username: admin
+ *        password: admin
+ *    responses:
+ *     200:
+ *      description: Admin object
+ *      content: 
+ *       application/json:
+ *        schema: 
+ *         $ref: '#/components/schemas/Admin'
+ */
+
 route.post("/login", authMiddleware);
 
 export default route;

@@ -80,7 +80,6 @@ router.get('/:id', userController.getUser);
  *       schema:
  *        $ref: '#/components/schemas/User'
  *       example:
- *        id: '9c46814aaf58f43eb1ad1bbc94c63e81'
  *        name: 'John'
  *        surname: 'Doe'
 *    responses:
