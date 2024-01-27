@@ -68,3 +68,5 @@ const bootstrap = () => {
 }
 
 bootstrap();
+
+export default app;

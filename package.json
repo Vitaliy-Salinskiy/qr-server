@@ -22,10 +22,15 @@
 		"multer": "^1.4.5-lts.1",
 		"passport": "^0.7.0",
 		"passport-local": "^1.0.0",
+		"supertest": "^6.3.4",
 		"swagger-jsdoc": "^6.2.8",
 		"swagger-ui-express": "^5.0.0"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.23.9",
+		"@babel/preset-env": "^7.23.9",
+		"babel-jest": "^29.7.0",
+		"jest": "^29.7.0",
 		"nodemon": "^3.0.2"
 	}
 }
