@@ -25,7 +25,7 @@ describe("Get /admins/:id", () => {
 	describe("Get by id work alright", () => {
 
 		test("Admin Id should exist", async () => {
-			const response = await request(app).get(`/admins/${adminId}`).send()
+			const response = await request(app).get(`/admins/${adminId}`)
 			const returnedAdminId = response.body._id;
 
 			expect(returnedAdminId).toBe(adminId)
@@ -33,13 +33,13 @@ describe("Get /admins/:id", () => {
 
 		test("Admin Id should not exist", async () => {
 			const nonExistingAdminId = "123456789012345678901234";
-			const response = await request(app).get(`/admins/${nonExistingAdminId}`).send()
+			const response = await request(app).get(`/admins/${nonExistingAdminId}`)
 
 			expect(response.statusCode).toBe(404)
 		})
 
 		test("Should return a 200 status code", async () => {
-			const response = await request(app).get(`/admins/${adminId}`).send()
+			const response = await request(app).get(`/admins/${adminId}`)
 
 			expect(response.statusCode).toBe(200)
 		})

@@ -5,6 +5,8 @@ export class AdminController {
 
 	async getAdmin(req, res) {
 		try {
+			if (!req.params.id) return res.status(400).json({ message: "No id provided" })
+
 			const admin = await Admin.findById(req.params.id);
 
 			if (!admin) return res.status(404).json({ message: "Admin not found" });
