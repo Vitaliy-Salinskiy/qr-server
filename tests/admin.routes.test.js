@@ -1,16 +1,21 @@
 import request from 'supertest';
-import app from "../../src/index.js"
+import app from "../src/index.js"
 import mongoose from 'mongoose';
 
 let server;
 
-beforeAll(() => {
-	server = app.listen(0, () => console.log(`Server running on port ${server.address().port}`));
+beforeAll((done) => {
+	server = app.listen(0, () => {
+		console.log(`Server running on port ${server.address().port}`);
+		done();
+	});
 });
 
-afterAll(async () => {
-	server.close();
-	await mongoose.connection.close();
+afterAll((done) => {
+	server.close(() => {
+		mongoose.connection.close();
+		done();
+	});
 });
 
 describe("Get /admins/:id", () => {

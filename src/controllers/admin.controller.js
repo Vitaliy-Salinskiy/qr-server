@@ -16,7 +16,6 @@ export class AdminController {
 	}
 
 	async createAdmin(req, res) {
-		console.log(req.body);
 		try {
 			const candidate = await Admin.findOne({ username: req.body.username });
 
