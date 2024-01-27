@@ -16,6 +16,15 @@ export class ProductController {
 
 	async createProduct(req, res) {
 		try {
+
+			if (!req.file) {
+				return res.status(400).json({ message: "Image is required" });
+			}
+
+			if (!req.body.name || !req.body.price) {
+				return res.status(400).json({ message: "Name and price are required" });
+			}
+
 			const product = await productService.createProduct(req.body, req.file);
 			res.status(201).json(product);
 		} catch (error) {
