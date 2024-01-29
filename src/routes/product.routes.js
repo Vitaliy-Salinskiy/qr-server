@@ -79,7 +79,6 @@ router.post("/",
 	productController.createProduct
 );
 
-
 /**
  * @swagger
  *  /products/{id}:

@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import session from 'express-session';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import cookieParser from 'cookie-parser';
 
 import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
@@ -14,6 +15,7 @@ import authRoutes from './routes/auth.routes.js';
 import requestRoutes from './routes/request.routes.js';
 
 import './strategies/local.strategy.js';
+import './strategies/jwt.strategy.js';
 
 dotenv.config();
 
@@ -38,6 +40,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(session({
 	secret: process.env.SESSION_SECRET,

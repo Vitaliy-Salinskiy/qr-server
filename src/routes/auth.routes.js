@@ -23,7 +23,6 @@ const authMiddleware = (req, res, next) => {
 	})(req, res, next);
 }
 
-
 /**
  * @swagger
  *  /auth/login:
@@ -49,5 +48,7 @@ const authMiddleware = (req, res, next) => {
  */
 
 route.post("/login", authMiddleware);
+
+route.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => res.json(req.user));
 
 export default route;
