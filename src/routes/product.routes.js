@@ -61,4 +61,30 @@ router.get("/", productController.getProducts);
 
 router.post("/", upload.single("image"), productController.createProduct);
 
+
+/**
+ * @swagger
+ *  /products/{id}:
+ *   delete:
+ *    tags: [Products]
+ *    summary: Delete a product
+ *    parameters:
+ *     - in: path
+ *       name: id
+ *       required: true
+ *       schema:
+ *        type: string
+ *        description: MongoDB unique identifier of the product
+ *        example: '65b6ba47be328f8075c759fb'
+ *    responses:
+ *     204:
+ *      description: The product was successfully deleted
+ *      content: 
+ *       application/json:
+ *        schema:
+ *         $ref: '#/components/schemas/Product'
+ */
+
+router.delete("/:id", productController.deleteProduct);
+
 export default router;
