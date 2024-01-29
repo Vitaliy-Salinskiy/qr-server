@@ -1,5 +1,8 @@
 import { Router } from "express";
+import { body } from "express-validator";
+
 import { AdminController } from "../controllers/admin.controller.js";
+import { validateResultMiddleware } from "../middlewares/index.js";
 
 const router = Router();
 const adminController = new AdminController();
@@ -53,6 +56,21 @@ router.get("/:id", adminController.getAdmin);
  *         $ref: '#/components/schemas/Admin'
  */
 
-router.post("/", adminController.createAdmin);
+router.post("/",
+	[
+		body('username')
+			.exists()
+			.withMessage('Username is required')
+			.isLength({ min: 1 })
+			.withMessage('Username must be at least 1 character long'),
+		body('password')
+			.exists()
+			.withMessage('Password is required')
+			.isLength({ min: 4 })
+			.withMessage('Password must be at least 4 characters long'),
+		validateResultMiddleware
+	],
+	adminController.createAdmin
+);
 
 export default router;

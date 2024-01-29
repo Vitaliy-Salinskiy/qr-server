@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/user.controller.js';
+import { body } from 'express-validator';
+import { validateResultMiddleware } from '../middlewares/index.js';
 
 const router = Router();
 const userController = new UserController();
@@ -156,6 +158,21 @@ router.put('/:id', userController.updateUser);
  *         $ref: '#/components/schemas/User'
  */
 
-router.put('/:id/credentials', userController.addCredentials);
+router.put('/:id/credentials',
+	[
+		body("data.name")
+			.exists()
+			.withMessage("Name is required")
+			.isLength({ min: 1 })
+			.withMessage("Name must be at least 1 character long"),
+		body("data.surname")
+			.exists()
+			.withMessage("Surname is required")
+			.isLength({ min: 1 })
+			.withMessage("Surname must be at least 1 character long"),
+		validateResultMiddleware
+	],
+	userController.addCredentials
+);
 
 export default router;

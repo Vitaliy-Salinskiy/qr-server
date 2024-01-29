@@ -1,5 +1,6 @@
-import Admin from "../schemas/admin.schema.js";
 import bcrypt from 'bcryptjs';
+
+import Admin from "../schemas/admin.schema.js";
 
 export class AdminController {
 
@@ -19,6 +20,7 @@ export class AdminController {
 
 	async createAdmin(req, res) {
 		try {
+
 			const candidate = await Admin.findOne({ username: req.body.username });
 
 			if (candidate) {

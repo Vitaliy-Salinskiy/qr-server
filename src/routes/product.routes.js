@@ -2,6 +2,8 @@ import { Router } from "express";
 import multer from "multer";
 
 import { ProductController } from "../controllers/product.controller.js";
+import { body } from "express-validator";
+import { validateResultMiddleware } from "../middlewares/index.js";
 
 const router = Router();
 const productController = new ProductController();
@@ -59,7 +61,23 @@ router.get("/", productController.getProducts);
  *         $ref: '#/components/schemas/Product'
  */
 
-router.post("/", upload.single("image"), productController.createProduct);
+router.post("/",
+	upload.single("image"),
+	[
+		body('name')
+			.exists()
+			.withMessage('Name is required')
+			.isLength({ min: 2 })
+			.withMessage('Name must be at least 2 characters long'),
+		body('price')
+			.exists()
+			.withMessage('Price is required')
+			.isInt({ min: 1, max: 125 })
+			.withMessage('Price must be an integer between 1 and 125'),
+		validateResultMiddleware,
+	],
+	productController.createProduct
+);
 
 
 /**

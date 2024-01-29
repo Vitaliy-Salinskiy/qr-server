@@ -9,9 +9,9 @@ export class ProductController {
 	async getProducts(req, res) {
 		try {
 			const products = await productService.getProducts()
-			res.status(200).json(products);
+			return res.status(200).json(products);
 		} catch (error) {
-			res.status(500).json({ message: error.message });
+			return res.status(500).json({ message: error.message });
 		}
 	}
 
@@ -27,9 +27,9 @@ export class ProductController {
 			}
 
 			const product = await productService.createProduct(req.body, req.file);
-			res.status(201).json(product);
+			return res.status(201).json(product);
 		} catch (error) {
-			res.status(500).json({ message: error.message });
+			return res.status(500).json({ message: error.message });
 		}
 	}
 
@@ -41,9 +41,9 @@ export class ProductController {
 				return res.status(404).json({ message: "Product not found" });
 			}
 
-			res.status(204).json(product);
+			return res.status(204).json("Product was deleted successfully");
 		} catch (error) {
-			res.status(500).json({ message: error.message });
+			return res.status(500).json({ message: error.message });
 		}
 	}
 
