@@ -21,7 +21,9 @@ const requestController = new RequestController();
  *          $ref: '#/components/schemas/Request'
  */
 
-router.get('/', requestController.getRequests);
+router.get('/', requestController.getAllRequests);
+
+router.get('/pending', requestController.getPendingRequests);
 
 /**
  * @swagger

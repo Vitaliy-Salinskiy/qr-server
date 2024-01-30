@@ -36,10 +36,54 @@ export class RequestController {
 		}
 	}
 
-	getRequests = async (req, res) => {
+	getPendingRequests = async (req, res) => {
 		try {
-			const requests = await Request.find().populate("userId productId").exec();
-			res.status(200).json(requests);
+			const page = parseInt(req.query.page) || 1;
+			const limit = 4;
+
+			const skipIndex = (page - 1) * limit;
+
+			const totalRequests = await Request.countDocuments({ status: "pending" });
+			const totalPages = Math.ceil(totalRequests / limit)
+
+			const requests = await Request.find({ status: "pending" })
+				.populate("userId productId")
+				.skip(skipIndex)
+				.limit(limit)
+				.exec();
+
+			res.status(200).json({
+				totalPendingRequest: totalRequests,
+				totalPages,
+				currentPage: page,
+				requests
+			});
+		} catch (error) {
+			res.status(500).json({ message: error.message });
+		}
+	}
+
+	getAllRequests = async (req, res) => {
+		try {
+			const page = parseInt(req.query.page) || 1;
+			const limit = 4;
+
+			const skipIndex = (page - 1) * limit;
+
+			const totalRequests = await Request.countDocuments();
+			const totalPages = Math.ceil(totalRequests / limit)
+
+			const requests = await Request.find()
+				.populate("userId productId")
+				.skip(skipIndex)
+				.limit(limit)
+				.exec();
+
+			res.status(200).json({
+				totalPages,
+				currentPage: page,
+				requests
+			});
 		} catch (error) {
 			res.status(500).json({ message: error.message });
 		}

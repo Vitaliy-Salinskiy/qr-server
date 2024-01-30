@@ -8,7 +8,7 @@ import Admin from '../schemas/admin.schema.js';
 const cookieExtractor = (req) => {
 	let token = null;
 	if (req && req.cookies) {
-		token = req.cookies['jwt'];
+		token = req.cookies['qr_jwt_token'];
 	}
 	return token;
 }
