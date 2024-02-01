@@ -17,5 +17,22 @@ export class FileService {
 		}
 	}
 
+	async deleteFile(imagePath) {
+		const baseDir = process.cwd();
+		const fullOldImagePath = path.join(baseDir, imagePath);
+
+		if (!fs.existsSync(fullOldImagePath)) {
+			console.log(`File not found: ${imagePath}`);
+			return false;
+		}
+
+		try {
+			fs.unlinkSync(fullOldImagePath);
+			return true;
+		} catch (error) {
+			throw new Error(`Error deleting image: ${error.message}`);
+		}
+	}
+
 
 }
