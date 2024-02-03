@@ -7,7 +7,7 @@ import session from 'express-session';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import cookieParser from 'cookie-parser';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
@@ -65,7 +65,7 @@ const storage = multer.diskStorage({
 		cb(null, '/tmp/uploads')
 	},
 	filename: function (req, file, cb) {
-		cb(null, uuid.v4() + '-' + Date.now())
+		cb(null, uuid() + '-' + Date.now())
 	}
 })
 
