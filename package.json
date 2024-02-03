@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"type": "module",
 	"engines": {
-		"node": "20.x"
+		"node": "18.x"
 	},
 	"scripts": {
 		"start": "node src/index.js",
