@@ -4,9 +4,6 @@
 	"description": "",
 	"main": "index.js",
 	"type": "module",
-	"engines": {
-		"node": "18.x"
-	},
 	"scripts": {
 		"start": "node src/index.js",
 		"dev": "nodemon src/index.js"
@@ -31,8 +28,7 @@
 		"passport-local": "^1.0.0",
 		"supertest": "^6.3.4",
 		"swagger-jsdoc": "^6.2.8",
-		"swagger-ui-express": "^5.0.0",
-		"uuid": "^9.0.1"
+		"swagger-ui-express": "^5.0.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.9",

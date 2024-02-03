@@ -7,7 +7,6 @@ import session from 'express-session';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import cookieParser from 'cookie-parser';
-import { v4 as uuid } from 'uuid';
 
 import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
@@ -60,18 +59,9 @@ app.use('/admins', adminRoutes);
 app.use('/auth', authRoutes);
 app.use('/requests', requestRoutes);
 
-const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, '/tmp/uploads')
-	},
-	filename: function (req, file, cb) {
-		cb(null, uuid() + '-' + Date.now())
-	}
-})
-
-const upload = multer({ storage: storage })
-
-app.use('/uploads', express.static('/tmp/uploads'));
+app.use('/uploads', express.static('uploads', {
+	maxAge: '1d'
+}));
 
 const bootstrap = () => {
 	try {
