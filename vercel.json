@@ -1,0 +1,10 @@
+{
+	"version": 2,
+	"name": "qr-server",
+	"routes": [
+		{
+			"src": "/(.*)",
+			"dest": "/src/index.js"
+		}
+	]
+}

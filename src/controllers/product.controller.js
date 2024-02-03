@@ -47,7 +47,6 @@ export class ProductController {
 			await fileService.deleteFile(product.image);
 
 			const requests = await Request.find({ productId: product._id }).populate('productId userId');
-			console.log(requests);
 
 			await Request.deleteMany({ productId: product._id });
 
