@@ -31,7 +31,8 @@
 		"passport-local": "^1.0.0",
 		"supertest": "^6.3.4",
 		"swagger-jsdoc": "^6.2.8",
-		"swagger-ui-express": "^5.0.0"
+		"swagger-ui-express": "^5.0.0",
+		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.9",
