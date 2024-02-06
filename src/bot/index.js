@@ -1,18 +1,21 @@
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new Telegraf(token);
 import { Telegraf, Markup } from 'telegraf';
-import { mainBoard } from './boards/index.js';
-import { returnBoard } from './boards/index.js';
+import { mainBoard, requestKeyBoard } from './boards/index.js';
+import { returnBoardToProducts } from './boards/index.js';
 import { productKeyBoard } from './boards/index.js';
+import { returnBoardToRequests } from './boards/index.js';
 
 export const botStart = () => {
-    let isLoggining = true;
     let isProducts = false;
     let isRequests = false;
     let isHistory = false;
     const adminPassword = "admin";
     let products = [];
     let selectedProduct = [];
+    let requests = [];
+    let selectedRequest = [];
+    let isLoggining = true;
 
     bot.start((ctx) => {
         ctx.reply('Вітаємо в телеграм боті!');
@@ -29,11 +32,9 @@ export const botStart = () => {
     bot.hears(/.*/, async (ctx) => {
         if (isLoggining) {
             const userPassword = ctx.message.text;
-            
             if (userPassword === adminPassword) {
-                
-                ctx.reply("Вітаємо в панелі адміністратора", mainBoard)
                 isLoggining = false;
+                ctx.reply("Вітаємо в панелі адміністратора", mainBoard)
             } else {
                 ctx.reply('Невірний пароль.');
             }
@@ -76,10 +77,52 @@ export const botStart = () => {
             }
             if (callback_data === 'remove') {
                 fetch(`http://localhost:5000/products/${selectedProduct._id}`, { method: 'DELETE' });
-                ctx.reply('Продукт видалено', returnBoard)
+                ctx.reply('Продукт видалено', returnBoardToProducts)
             }
         }
         
+        // Обробка запитів
+        if (callback_data === 'requests') {
+            try {
+                isRequests = true;
+                const response = await fetch('http://localhost:5000/requests');
+                requests = await response.json();
+                requests = requests.requests;
+
+                let requestsInline = requests.map(request => [
+                    { text: `${request.productId.name}: ${request._id}`, callback_data: request._id }
+                ]); 
+                
+                requestsInline.push([{ text: "Повернутись на головну", callback_data: "general_menu" }]);
+
+                const requestKeyBoard = {
+                    reply_markup: { inline_keyboard: requestsInline }
+                };
+
+                ctx.reply('Список запитів: ', requestKeyBoard);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        }
+        if (isRequests) {
+            if (callback_data !== 'requests' && callback_data !== 'allow', callback_data !== 'deny' && callback_data !== 'general_menu') {
+                const selectRequest = requests.find(request => request._id === callback_data);
+                if (selectRequest) {
+                    const reqString = `Запит - ${selectRequest.productId.name}: ${selectRequest._id}`;
+                    ctx.reply(reqString, requestKeyBoard);
+                    
+                    selectedRequest = selectRequest;
+                }
+            }
+            if (callback_data === 'allow') {
+                fetch(`http://localhost:5000/requests/${selectedRequest._id}/allow`, { method: 'POST' });
+                ctx.reply('Запит прийнято', returnBoardToRequests)
+            }
+            if (callback_data === 'deny') {
+                fetch(`http://localhost:5000/requests/${selectedRequest._id}/deny`, { method: 'POST' });
+                ctx.reply('Запит відхилено', returnBoardToRequests)
+            }
+        }
         
 
         // Перехід на головне меню

@@ -12,11 +12,21 @@ export const mainBoard = {
     }
 };
 
-export const returnBoard = {
+export const returnBoardToProducts = {
     reply_markup: {
         inline_keyboard: [
             [
                 { text: "Повернутись", callback_data: "products"},
+            ]
+        ]
+    }
+}
+
+export const returnBoardToRequests = {
+    reply_markup: {
+        inline_keyboard: [
+            [
+                { text: "Повернутись", callback_data: "requests"},
             ]
         ]
     }
@@ -28,6 +38,18 @@ export const productKeyBoard = {
             [
                 { text: "Видалити", callback_data: "remove"},
                 { text: "Повернутись", callback_data: "products"},
+            ]
+        ]
+    }
+}
+
+export const requestKeyBoard = {
+    reply_markup: {
+        inline_keyboard: [
+            [
+                { text: "Прийняти", callback_data: "allow" },
+                { text: "Відхилити", callback_data: "deny"},
+                { text: "Повернутись", callback_data: "requests"},
             ]
         ]
     }
