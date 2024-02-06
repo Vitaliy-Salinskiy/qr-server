@@ -1,10 +1,7 @@
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new Telegraf(token);
-import { Telegraf, Markup } from 'telegraf';
-import { mainBoard, requestKeyBoard } from './boards/index.js';
-import { returnBoardToProducts } from './boards/index.js';
-import { productKeyBoard } from './boards/index.js';
-import { returnBoardToRequests } from './boards/index.js';
+import { Telegraf } from 'telegraf';
+import { mainBoard, requestKeyBoard, returnToGeneral, returnBoardToProducts, productKeyBoard, returnBoardToRequests } from './boards/index.js';
 
 export const botStart = () => {
     let isProducts = false;
@@ -16,6 +13,7 @@ export const botStart = () => {
     let requests = [];
     let selectedRequest = [];
     let isLoggining = true;
+    let historyString = ''; 
 
     bot.start((ctx) => {
         ctx.reply('Вітаємо в телеграм боті!');
@@ -57,7 +55,7 @@ export const botStart = () => {
                     { text: product.name, callback_data: product._id }
                 ]);
                 
-                productsInline.push([{ text: "Повернутись на головну", callback_data: "general_menu" }]);
+                productsInline.push(returnToGeneral);
 
                 const productKeyBoard = {
                     reply_markup: { inline_keyboard: productsInline }
@@ -85,7 +83,7 @@ export const botStart = () => {
         if (callback_data === 'requests') {
             try {
                 isRequests = true;
-                const response = await fetch('http://localhost:5000/requests');
+                const response = await fetch('http://localhost:5000/requests/pending');
                 requests = await response.json();
                 requests = requests.requests;
 
@@ -93,7 +91,7 @@ export const botStart = () => {
                     { text: `${request.productId.name}: ${request._id}`, callback_data: request._id }
                 ]); 
                 
-                requestsInline.push([{ text: "Повернутись на головну", callback_data: "general_menu" }]);
+                requestsInline.push(returnToGeneral);
 
                 const requestKeyBoard = {
                     reply_markup: { inline_keyboard: requestsInline }
@@ -101,7 +99,7 @@ export const botStart = () => {
 
                 ctx.reply('Список запитів: ', requestKeyBoard);
             } catch (error) {
-                console.error('Error fetching products:', error);
+                console.error('Error fetching requests:', error);
             }
         }
         if (isRequests) {
@@ -123,8 +121,31 @@ export const botStart = () => {
                 ctx.reply('Запит відхилено', returnBoardToRequests)
             }
         }
-        
 
+        // Обробка історії
+        if (callback_data === 'history') {
+            try {
+                isRequests = true;
+                const response = await fetch('http://localhost:5000/requests/pending');
+                requests = await response.json();
+                requests = requests.requests;                
+                historyString = 'Історія запитів:'
+
+                requests.map(request => {
+                    historyString += `
+                        \nId запиту: ${request._id}
+                        \nId продукту: ${request.productId._id}
+                        \nСтатус запита: ${request.status}
+                        \nСтворений: ${new Date(request.createdAt).toLocaleString()}
+                        \nЗмінений: ${new Date(request.updatedAt).toLocaleString()}                   
+                    `;
+                });
+
+                ctx.reply(historyString, returnToGeneral)
+            } catch (error) {
+                console.error('Error fetching history:', error);
+            }
+        }
         // Перехід на головне меню
         if (callback_data === 'general_menu') {
             getGeneralMenu(ctx);

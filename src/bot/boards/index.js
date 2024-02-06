@@ -22,6 +22,16 @@ export const returnBoardToProducts = {
     }
 }
 
+export const returnToGeneral = {
+    reply_markup: {
+        inline_keyboard: [
+            [
+                { text: "Повернутись", callback_data: "general_menu"},
+            ]
+        ]
+    }
+}
+
 export const returnBoardToRequests = {
     reply_markup: {
         inline_keyboard: [
