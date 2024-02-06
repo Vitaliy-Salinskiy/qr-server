@@ -1,3 +1,4 @@
+import User from '../schemas/user.schema.js';
 import { UserService } from '../services/user.service.js';
 
 export class UserController {
@@ -57,6 +58,34 @@ export class UserController {
 			return res.status(500).json({ message: error.message });
 		}
 	};
+
+	addScansByPrize = async (req, res) => {
+		try {
+			 if (!req.params.id || !req.body.prize) return res.status(400).json({ message: "Bad request" });
+  
+			 const user = await User.findOne({ id: req.params.id });
+			 
+			 if (!user) return res.status(404).json({ message: "User not found" });
+			 
+			 const dayLimit = process.env.SPIN_LIMIT;
+			 const lastScannedDate = user.wheelSpinDate ? new Date(user.wheelSpinDate.toISOString().split('T')[0]) : null;
+  
+			 const daysAgo = new Date();
+			 daysAgo.setDate(daysAgo.getDate() - dayLimit);
+  
+			 if (lastScannedDate !== null && lastScannedDate >= daysAgo) {
+				  return res.status(400).json({ message: `You have already scanned in the last ${dayLimit} days` });
+			 }
+  
+			 user.timesScanned += req.body.prize;
+			 user.wheelSpinDate = new Date();
+			 await user.save();
+  
+			 return res.status(200).json({ user });
+		} catch (error) {
+			 return res.status(500).json({ message: error.message });
+		}
+  }
 
 	addCredentials = async (req, res) => {
 		try {

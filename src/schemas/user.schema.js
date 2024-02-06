@@ -52,6 +52,12 @@ const ScanHistorySchema = new Schema({
  *         example: 2024-01-24T05:04:12.755+00:00
  *         default: null
  *         description: Date of the last scan
+ *       wheelSpinDate: 
+ *         type: string
+ *         format: date-time
+ *         example: 2024-01-24T05:04:12.755+00:00
+ *         default: null
+ *         description: Date of the last scan
  *       timesScanned:
  *         type: number
  *         example: 32
@@ -96,6 +102,8 @@ const UserSchema = new Schema({
 	lastScanned: { type: Date, default: null, },
 
 	timesScanned: { type: Number, default: 0, },
+
+	wheelSpinDate: { type: Date, default: null, },
 
 	scanHistory: { type: [ScanHistorySchema], default: [], },
 

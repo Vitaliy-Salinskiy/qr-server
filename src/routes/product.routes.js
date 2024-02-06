@@ -8,7 +8,7 @@ import { validateResultMiddleware } from "../middlewares/index.js";
 const router = Router();
 const productController = new ProductController();
 
-const upload = multer({ dest: "uploads/" })
+const upload = multer({ dest: "uploads/" });
 
 /**
  * @swagger
@@ -61,45 +61,46 @@ router.get("/", productController.getProducts);
  *         $ref: '#/components/schemas/Product'
  */
 
-router.post("/",
-	upload.single("image"),
-	[
-		body('name')
-			.exists()
-			.withMessage('Name is required')
-			.isLength({ min: 2 })
-			.withMessage('Name must be at least 2 characters long'),
-		body('price')
-			.exists()
-			.withMessage('Price is required')
-			.isInt({ min: 1, max: 125 })
-			.withMessage('Price must be an integer between 1 and 125'),
-		validateResultMiddleware,
-	],
-	productController.createProduct
+router.post(
+  "/",
+  upload.single("image"),
+  [
+    body("name")
+      .exists()
+      .withMessage("Name is required")
+      .isLength({ min: 2 })
+      .withMessage("Name must be at least 2 characters long"),
+    body("price")
+      .exists()
+      .withMessage("Price is required")
+      .isInt({ min: 1, max: 125 })
+      .withMessage("Price must be an integer between 1 and 125"),
+    validateResultMiddleware,
+  ],
+  productController.createProduct
 );
 
 /**
  * @swagger
  *  /products/{id}:
- *   delete:
- *    tags: [Products]
- *    summary: Delete a product
- *    parameters:
- *     - in: path
- *       name: id
- *       required: true
- *       schema:
- *        type: string
- *        description: MongoDB unique identifier of the product
- *        example: '65b6ba47be328f8075c759fb'
- *    responses:
- *     204:
- *      description: The product was successfully deleted
- *      content: 
- *       application/json:
- *        schema:
- *         $ref: '#/components/schemas/Product'
+ *    delete:
+ *      tags: [Products]
+ *      summary: Delete a product
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          schema:
+ *           type: string
+ *           required: true
+ *           description: MongoDB unique identifier of the product
+ *      responses:
+ *        204:
+ *          description: The product was deleted successfully
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: string
+ *                example: "Product was deleted successfully"
  */
 
 router.delete("/:id", productController.deleteProduct);

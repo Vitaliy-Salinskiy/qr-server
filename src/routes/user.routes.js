@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import { UserController } from '../controllers/user.controller.js';
-import { body } from 'express-validator';
-import { validateResultMiddleware } from '../middlewares/index.js';
+import { Router } from "express";
+import { UserController } from "../controllers/user.controller.js";
+import { body } from "express-validator";
+import { validateResultMiddleware } from "../middlewares/index.js";
 
 const router = Router();
 const userController = new UserController();
@@ -23,12 +23,12 @@ const userController = new UserController();
  *          $ref: '#/components/schemas/User'
  */
 
-router.get('/', userController.getUsers);
+router.get("/", userController.getUsers);
 
 /**
  * @swagger
  *  /users/scans:
- *   get: 
+ *   get:
  *    tags: [Users]
  *    summary: Get all scans
  *    responses:
@@ -42,12 +42,12 @@ router.get('/', userController.getUsers);
  *         example: 121
  */
 
-router.get('/scans', userController.getAllScans);
+router.get("/scans", userController.getAllScans);
 
 /**
  * @swagger
  *  /users/{id}:
- *   get: 
+ *   get:
  *    tags: [Users]
  *    summary: Get user by id
  *    parameters:
@@ -67,7 +67,7 @@ router.get('/scans', userController.getAllScans);
  *          $ref: '#/components/schemas/User'
  */
 
-router.get('/:id', userController.getUser);
+router.get("/:id", userController.getUser);
 
 /**
  * @swagger
@@ -84,7 +84,7 @@ router.get('/:id', userController.getUser);
  *       example:
  *        name: 'John'
  *        surname: 'Doe'
-*    responses:
+ *    responses:
  *     200:
  *      description: User object
  *      content:
@@ -93,7 +93,7 @@ router.get('/:id', userController.getUser);
  *         $ref: '#/components/schemas/User'
  */
 
-router.post('/', userController.createUser);
+router.post("/", userController.createUser);
 
 /**
  * @swagger
@@ -118,7 +118,7 @@ router.post('/', userController.createUser);
  *         $ref: '#/components/schemas/User'
  */
 
-router.put('/:id', userController.updateUser);
+router.put("/:id", userController.updateUser);
 
 /**
  * @swagger
@@ -129,7 +129,7 @@ router.put('/:id', userController.updateUser);
  *    parameters:
  *     - in: path
  *       name: id
- *       schema: 
+ *       schema:
  *        type: string
  *       required: true
  *       description: MongoDB unique identifier of the user
@@ -141,7 +141,7 @@ router.put('/:id', userController.updateUser);
  *       schema:
  *        type: object
  *        properties:
- *         name: 
+ *         name:
  *          type: string
  *          description: Name of the user
  *          example: 'John'
@@ -158,21 +158,56 @@ router.put('/:id', userController.updateUser);
  *         $ref: '#/components/schemas/User'
  */
 
-router.put('/:id/credentials',
-	[
-		body("data.name")
-			.exists()
-			.withMessage("Name is required")
-			.isLength({ min: 1 })
-			.withMessage("Name must be at least 1 character long"),
-		body("data.surname")
-			.exists()
-			.withMessage("Surname is required")
-			.isLength({ min: 1 })
-			.withMessage("Surname must be at least 1 character long"),
-		validateResultMiddleware
-	],
-	userController.addCredentials
+router.put(
+  "/:id/credentials",
+  [
+    body("data.name")
+      .exists()
+      .withMessage("Name is required")
+      .isLength({ min: 1 })
+      .withMessage("Name must be at least 1 character long"),
+    body("data.surname")
+      .exists()
+      .withMessage("Surname is required")
+      .isLength({ min: 1 })
+      .withMessage("Surname must be at least 1 character long"),
+    validateResultMiddleware,
+  ],
+  userController.addCredentials
 );
+
+/**
+ * @swagger
+ * /prize/{id}:
+ *   put:
+ *     summary: Add scans by prize
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               prize:
+ *                 type: number
+ *                 description: The prize value to add to timesScanned
+ *     responses:
+ *       200:
+ *         description: The user was updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ */
+
+router.put("/prize/:id", userController.addScansByPrize);
 
 export default router;

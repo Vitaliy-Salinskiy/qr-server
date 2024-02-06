@@ -7,21 +7,21 @@ const route = new Router();
 const authController = new AuthController();
 
 const authMiddleware = (req, res, next) => {
-	passport.authenticate('local', (err, user, info) => {
-		if (err) {
-			return next(err);
-		}
-		if (!user) {
-			return res.status(401).json({ message: info.message });
-		}
-		req.logIn(user, (err) => {
-			if (err) {
-				return next(err);
-			}
-			authController.login(req, res);
-		});
-	})(req, res, next);
-}
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ message: info.message });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      authController.login(req, res);
+    });
+  })(req, res, next);
+};
 
 /**
  * @swagger
@@ -31,7 +31,7 @@ const authMiddleware = (req, res, next) => {
  *    summary: Login
  *    requestBody:
  *     required: true
- *     content: 
+ *     content:
  *      application/json:
  *       schema:
  *        $ref: '#/components/schemas/Admin'
@@ -41,14 +41,37 @@ const authMiddleware = (req, res, next) => {
  *    responses:
  *     200:
  *      description: Admin object
- *      content: 
+ *      content:
  *       application/json:
- *        schema: 
+ *        schema:
  *         $ref: '#/components/schemas/Admin'
  */
 
 route.post("/login", authMiddleware);
 
-route.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => res.json(req.user));
+/**
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     summary: Get admin profile by extracting JWT token from cookies
+ *     tags: [Auth]
+ *     security:
+ *       - jwt: []
+ *     responses:
+ *       200:
+ *         description: The user profile was retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Admin'
+ *       401:
+ *         description: Unauthorized
+ */
+
+route.get(
+  "/profile",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => res.json(req.user)
+);
 
 export default route;
