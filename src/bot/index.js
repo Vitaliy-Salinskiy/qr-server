@@ -16,15 +16,15 @@ export const botStart = () => {
     let historyString = ''; 
 
     bot.start((ctx) => {
-        ctx.reply('Вітаємо в телеграм боті!');
-        ctx.reply('Введіть пароль в адмін панель:');
+        ctx.reply('Вітаємо в телеграм боті!👋');
+        ctx.reply('🔐Введіть пароль для входу в адмін панель🔐');
     });
     
     const getGeneralMenu = (ctx) => {
         isProducts = false;
         isRequests = false;
         isHistory = false;
-        ctx.reply('Головне меню', mainBoard);
+        ctx.reply('👤Головне меню👤', mainBoard);
     }
 
     bot.hears(/.*/, async (ctx) => {
@@ -32,12 +32,12 @@ export const botStart = () => {
             const userPassword = ctx.message.text;
             if (userPassword === adminPassword) {
                 isLoggining = false;
-                ctx.reply("Вітаємо в панелі адміністратора", mainBoard)
+                ctx.reply("✅Успішний вхід!✅", mainBoard)
             } else {
-                ctx.reply('Невірний пароль.');
+                ctx.reply('❌Невірний пароль.❌');
             }
         } else {
-            ctx.reply('Я вас не розумію!');
+            ctx.reply('Я вас не розумію!🤷');
         }
     });
 
@@ -51,17 +51,15 @@ export const botStart = () => {
                 const response = await fetch('http://localhost:5000/products');
                 products = await response.json();
 
-                let productsInline = products.map(product => [
-                    { text: product.name, callback_data: product._id }
-                ]);
+                let productsInline = products.map(product => ([{ text: `🪙${product.name}🪙`, callback_data: product._id }]));
                 
-                productsInline.push(returnToGeneral);
+                productsInline.push([{ text: "Повернутись⬅️", callback_data: "general_menu"}]);
 
-                const productKeyBoard = {
+                const productsKeyBoard = {
                     reply_markup: { inline_keyboard: productsInline }
                 };
 
-                ctx.reply('Список продуктів: ', productKeyBoard);
+                ctx.reply('📋Список продуктів: ', productsKeyBoard);
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
@@ -69,13 +67,13 @@ export const botStart = () => {
         if (isProducts) {
             if (callback_data !== 'products' && callback_data !== 'remove' && callback_data !== 'general_menu') {
                 const selectProduct = products.find(product => product._id === callback_data);
-                ctx.reply(`Продукт: ${selectProduct.name}`, productKeyBoard);
+                ctx.reply(`🧺Продукт: ${selectProduct.name}`, productKeyBoard);
                 
                 selectedProduct = selectProduct;
             }
             if (callback_data === 'remove') {
                 fetch(`http://localhost:5000/products/${selectedProduct._id}`, { method: 'DELETE' });
-                ctx.reply('Продукт видалено', returnBoardToProducts)
+                ctx.reply('Продукт видалено✅', returnBoardToProducts)
             }
         }
         
@@ -88,16 +86,16 @@ export const botStart = () => {
                 requests = requests.requests;
 
                 let requestsInline = requests.map(request => [
-                    { text: `${request.productId.name}: ${request._id}`, callback_data: request._id }
+                    { text: `❔${request.productId.name}: ${request._id}❔`, callback_data: request._id }
                 ]); 
                 
-                requestsInline.push(returnToGeneral);
+                requestsInline.push([{ text: "Повернутись", callback_data: "general_menu"}]);
 
                 const requestKeyBoard = {
                     reply_markup: { inline_keyboard: requestsInline }
                 };
 
-                ctx.reply('Список запитів: ', requestKeyBoard);
+                ctx.reply('📋Список запитів: ', requestKeyBoard);
             } catch (error) {
                 console.error('Error fetching requests:', error);
             }
@@ -105,8 +103,9 @@ export const botStart = () => {
         if (isRequests) {
             if (callback_data !== 'requests' && callback_data !== 'allow', callback_data !== 'deny' && callback_data !== 'general_menu') {
                 const selectRequest = requests.find(request => request._id === callback_data);
+                console.log(requests);
                 if (selectRequest) {
-                    const reqString = `Запит - ${selectRequest.productId.name}: ${selectRequest._id}`;
+                    const reqString = `🔀Запит - ${selectRequest.productId.name}: ${selectRequest._id}`;
                     ctx.reply(reqString, requestKeyBoard);
                     
                     selectedRequest = selectRequest;
@@ -129,15 +128,11 @@ export const botStart = () => {
                 const response = await fetch('http://localhost:5000/requests/pending');
                 requests = await response.json();
                 requests = requests.requests;                
-                historyString = 'Історія запитів:'
+                historyString = '⏳Історія запитів:'
 
                 requests.map(request => {
                     historyString += `
-                        \nId запиту: ${request._id}
-                        \nId продукту: ${request.productId._id}
-                        \nСтатус запита: ${request.status}
-                        \nСтворений: ${new Date(request.createdAt).toLocaleString()}
-                        \nЗмінений: ${new Date(request.updatedAt).toLocaleString()}                   
+                        \n🆔Id запиту: ${request._id}\n🆔Id продукту: ${request.productId._id}\nℹ️Статус запита: ${request.status}\n📅Створений: ${new Date(request.createdAt).toLocaleString()}\n📅Змінений: ${new Date(request.updatedAt).toLocaleString()}                   
                     `;
                 });
 
