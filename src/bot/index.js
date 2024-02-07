@@ -7,7 +7,6 @@ export const botStart = () => {
     let isProducts = false;
     let isRequests = false;
     let isHistory = false;
-    const adminPassword = "admin";
     let products = [];
     let selectedProduct = [];
     let requests = [];
@@ -30,12 +29,21 @@ export const botStart = () => {
     bot.hears(/.*/, async (ctx) => {
         if (isLoggining) {
             const userPassword = ctx.message.text;
-            if (userPassword === adminPassword) {
-                isLoggining = false;
-                ctx.reply("✅Успішний вхід!✅", mainBoard)
-            } else {
-                ctx.reply('❌Невірний пароль.❌');
-            }
+            const postData = { username: 'admin', password: userPassword };
+
+            fetch('http://localhost:5000/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData),
+            })
+                .then((response) => {
+                    if (response.status === 200) {
+                        isLoggining = false;
+                        ctx.reply("✅Успішний вхід!✅", mainBoard)
+                    } else ctx.reply('❌Невірний пароль.❌');
+                });
         } else {
             ctx.reply('Я вас не розумію!🤷');
         }
@@ -103,7 +111,7 @@ export const botStart = () => {
         if (isRequests) {
             if (callback_data !== 'requests' && callback_data !== 'allow', callback_data !== 'deny' && callback_data !== 'general_menu') {
                 const selectRequest = requests.find(request => request._id === callback_data);
-                console.log(requests);
+
                 if (selectRequest) {
                     const reqString = `🔀Запит - ${selectRequest.productId.name}: ${selectRequest._id}`;
                     ctx.reply(reqString, requestKeyBoard);
@@ -124,7 +132,7 @@ export const botStart = () => {
         // Обробка історії
         if (callback_data === 'history') {
             try {
-                isRequests = true;
+                isHistory = true;
                 const response = await fetch('http://localhost:5000/requests/pending');
                 requests = await response.json();
                 requests = requests.requests;                
