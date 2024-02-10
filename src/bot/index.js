@@ -133,7 +133,7 @@ export const botStart = () => {
         if (callback_data === 'history') {
             try {
                 isHistory = true;
-                const response = await fetch('http://localhost:5000/requests/pending');
+                const response = await fetch('http://localhost:5000/requests/');
                 requests = await response.json();
                 requests = requests.requests;                
                 historyString = '⏳Історія запитів:'
