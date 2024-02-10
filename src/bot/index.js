@@ -4,15 +4,10 @@ import { Telegraf } from 'telegraf';
 import { mainBoard, requestKeyBoard, returnToGeneral, returnBoardToProducts, productKeyBoard, returnBoardToRequests } from './boards/index.js';
 
 export const botStart = () => {
-    let isLoggining = true;
     let historyInfo = { historyPag: 1, historyPagLimit: 1, historyString: '⏳Історія запитів:' };
-    let products = [];
-    let selectedProduct = [];
-    let requests = [];
-    let selectedRequest = [];
-    let isProducts = false;
-    let isRequests = false;
-    let isHistory = false;
+    let requestInfo = { requestPag: 1, requestPagLimit: 1 };
+    let products = [], selectedProduct = [], requests = [], selectedRequest = [];
+    let isProducts = false, isRequests = false, isHistory = false, isLoggining = true;
 
     bot.start((ctx) => {
         ctx.reply('Вітаємо в телеграм боті!👋');
@@ -24,6 +19,10 @@ export const botStart = () => {
         isRequests = false;
         isHistory = false;
         ctx.reply('👤Головне меню👤', mainBoard);
+        historyInfo = { historyPag: 1, historyPagLimit: 1, historyString: '⏳Історія запитів:' };
+        requestInfo = { requestPag: 1, requestPagLimit: 1 };
+        products = [], selectedProduct = [], requests = [], selectedRequest = [];
+        isProducts = false, isRequests = false, isHistory = false;
     }
 
     bot.hears(/.*/, async (ctx) => {
@@ -70,7 +69,9 @@ export const botStart = () => {
                     inline_keyboard: [
                         [
                             { text: "⬅️", callback_data: "prev-history-pag" },
-                            { text: historyInfo.historyPag, callback_data: "none" },
+                            { text: '🎯1', callback_data: "set-history-page-first" },
+                            { text: `${historyInfo.historyPag}`, callback_data: "none" },
+                            { text: `🎯${historyInfo.historyPagLimit}`, callback_data: "set-history-page-last" },
                             { text: "➡️", callback_data: "next-history-pag" }
                         ],
                         [
@@ -83,6 +84,41 @@ export const botStart = () => {
             console.error('Error fetching history:', error);
         }
     };
+
+    const getRequests = async (ctx) => {
+        try {
+            isRequests = true;
+            const response = await fetch(`http://localhost:5000/requests/pending?page=${requestInfo.requestPag}`);
+            requests = await response.json();
+            requestInfo.requestPagLimit = requests.totalPages;
+
+            requests = requests.requests;
+
+            let requestsInline = requests.map(request => [
+                { text: `❔${request.productId.name}: ${request._id}❔`, callback_data: request._id }
+            ]); 
+            
+            requestsInline.push(
+                [
+                    { text: "⬅️", callback_data: "prev-request-pag" },
+                    { text: '🎯1', callback_data: "set-request-page-first" },
+                    { text: requestInfo.requestPag, callback_data: "none" },
+                    { text: `🎯${requestInfo.requestPagLimit}`, callback_data: "set-request-page-last" },
+                    { text: "➡️", callback_data: "next-request-pag" }                  
+                ]
+            );
+
+            requestsInline.push([{ text: "Повернутись на головну⬅️", callback_data: "general_menu" }]);
+            
+            const requestKeyBoard = {
+                reply_markup: { inline_keyboard: requestsInline }
+            };
+
+            ctx.reply('📋Список запитів: ', requestKeyBoard);
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+        }
+    }
 
     bot.on('callback_query', async (ctx) => {
         const callback_data = ctx.callbackQuery.data;
@@ -122,28 +158,29 @@ export const botStart = () => {
         
         // Обробка запитів
         if (callback_data === 'requests') {
-            try {
-                isRequests = true;
-                const response = await fetch('http://localhost:5000/requests/pending');
-                requests = await response.json();
-                requests = requests.requests;
-
-                let requestsInline = requests.map(request => [
-                    { text: `❔${request.productId.name}: ${request._id}❔`, callback_data: request._id }
-                ]); 
-                
-                requestsInline.push([{ text: "Повернутись", callback_data: "general_menu"}]);
-
-                const requestKeyBoard = {
-                    reply_markup: { inline_keyboard: requestsInline }
-                };
-
-                ctx.reply('📋Список запитів: ', requestKeyBoard);
-            } catch (error) {
-                console.error('Error fetching requests:', error);
-            }
+            getRequests(ctx);
         }
         if (isRequests) {
+            if (callback_data === 'prev-request-pag') {
+                if (requestInfo.requestPag > 1) {
+                    requestInfo.requestPag--;
+                    getRequests(ctx);
+                }else getRequests(ctx);
+            }
+            if (callback_data === 'next-request-pag') {
+                if (requestInfo.requestPag < requestInfo.requestPagLimit) {
+                    requestInfo.requestPag++;
+                    getRequests(ctx);
+                } else getRequests(ctx);
+            }
+            if (callback_data === 'set-request-page-first') {
+                requestInfo.requestPag = 1;
+                getRequests(ctx);
+            }
+            if (callback_data === 'set-request-page-last') {
+                requestInfo.requestPag = requestInfo.requestPagLimit;
+                getRequests(ctx);
+            }
             if (callback_data !== 'requests' && callback_data !== 'allow', callback_data !== 'deny' && callback_data !== 'general_menu') {
                 const selectRequest = requests.find(request => request._id === callback_data);
 
@@ -156,11 +193,11 @@ export const botStart = () => {
             }
             if (callback_data === 'allow') {
                 fetch(`http://localhost:5000/requests/${selectedRequest._id}/allow`, { method: 'POST' });
-                ctx.reply('Запит прийнято', returnBoardToRequests)
+                ctx.reply('Запит прийнято', returnBoardToRequests);
             }
             if (callback_data === 'deny') {
                 fetch(`http://localhost:5000/requests/${selectedRequest._id}/deny`, { method: 'POST' });
-                ctx.reply('Запит відхилено', returnBoardToRequests)
+                ctx.reply('Запит відхилено', returnBoardToRequests);
             }
         }
 
@@ -182,6 +219,14 @@ export const botStart = () => {
                     historyInfo.historyPag++;
                     getHistory(ctx);
                 } else getHistory(ctx);
+            }
+            if (callback_data === 'set-history-page-first') {
+                historyInfo.historyPag = 1;
+                getHistory(ctx);
+            }
+            if (callback_data === 'set-history-page-last') {
+                historyInfo.historyPag = historyInfo.historyPagLimit;
+                getHistory(ctx);
             }
         }
         // Перехід на головне меню

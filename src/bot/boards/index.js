@@ -59,8 +59,8 @@ export const requestKeyBoard = {
             [
                 { text: "✅Прийняти✅", callback_data: "allow" },
                 { text: "❌Відхилити❌", callback_data: "deny"},
-                { text: "Повернутись⬅️", callback_data: "requests"},
-            ]
+            ],
+            [{ text: "Повернутись⬅️", callback_data: "requests"}]
         ]
     }
 }
