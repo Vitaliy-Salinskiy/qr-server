@@ -4,15 +4,15 @@ import { Telegraf } from 'telegraf';
 import { mainBoard, requestKeyBoard, returnToGeneral, returnBoardToProducts, productKeyBoard, returnBoardToRequests } from './boards/index.js';
 
 export const botStart = () => {
-    let isProducts = false;
-    let isRequests = false;
-    let isHistory = false;
+    let isLoggining = true;
+    let historyInfo = { historyPag: 1, historyPagLimit: 1, historyString: '⏳Історія запитів:' };
     let products = [];
     let selectedProduct = [];
     let requests = [];
     let selectedRequest = [];
-    let isLoggining = true;
-    let historyString = ''; 
+    let isProducts = false;
+    let isRequests = false;
+    let isHistory = false;
 
     bot.start((ctx) => {
         ctx.reply('Вітаємо в телеграм боті!👋');
@@ -48,6 +48,41 @@ export const botStart = () => {
             ctx.reply('Я вас не розумію!🤷');
         }
     });
+
+    const getHistory = async (ctx) => {
+        try {
+            isHistory = true;
+            historyInfo.historyString = '⏳Історія запитів:';
+            const response = await fetch(`http://localhost:5000/requests?page=${historyInfo.historyPag}`);
+            requests = await response.json();
+            historyInfo.historyPagLimit = requests.totalPages;
+
+            requests = requests.requests;
+
+            requests.map(request => {
+                historyInfo.historyString += `
+                    \n🆔Id запиту: ${request._id}\n🆔Id продукту: ${request.productId._id}\nℹ️Статус запита: ${request.status}\n📅Створений: ${new Date(request.createdAt).toLocaleString()}\n📅Змінений: ${new Date(request.updatedAt).toLocaleString()}                   
+                `;
+            });
+
+            ctx.reply(historyInfo.historyString, {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: "⬅️", callback_data: "prev-history-pag" },
+                            { text: historyInfo.historyPag, callback_data: "none" },
+                            { text: "➡️", callback_data: "next-history-pag" }
+                        ],
+                        [
+                            { text: "Повернутись на головну⬅️", callback_data: "general_menu"},
+                        ]
+                    ]
+                }
+            })
+        } catch (error) {
+            console.error('Error fetching history:', error);
+        }
+    };
 
     bot.on('callback_query', async (ctx) => {
         const callback_data = ctx.callbackQuery.data;
@@ -131,22 +166,22 @@ export const botStart = () => {
 
         // Обробка історії
         if (callback_data === 'history') {
-            try {
-                isHistory = true;
-                const response = await fetch('http://localhost:5000/requests/');
-                requests = await response.json();
-                requests = requests.requests;                
-                historyString = '⏳Історія запитів:'
+            isHistory = true;
+            getHistory(ctx);
+        }
 
-                requests.map(request => {
-                    historyString += `
-                        \n🆔Id запиту: ${request._id}\n🆔Id продукту: ${request.productId._id}\nℹ️Статус запита: ${request.status}\n📅Створений: ${new Date(request.createdAt).toLocaleString()}\n📅Змінений: ${new Date(request.updatedAt).toLocaleString()}                   
-                    `;
-                });
-
-                ctx.reply(historyString, returnToGeneral)
-            } catch (error) {
-                console.error('Error fetching history:', error);
+        if (isHistory) {
+            if (callback_data === 'prev-history-pag') {
+                if (historyInfo.historyPag > 1) {
+                    historyInfo.historyPag--;
+                    getHistory(ctx);
+                } else getHistory(ctx);
+            }
+            if (callback_data === 'next-history-pag') {
+                if (historyInfo.historyPag <= historyInfo.historyPagLimit - 1) {
+                    historyInfo.historyPag++;
+                    getHistory(ctx);
+                } else getHistory(ctx);
             }
         }
         // Перехід на головне меню
